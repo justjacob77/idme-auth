@@ -11,10 +11,11 @@
     <button>Verify with ID.me</button>
   </a>
   <script>
+    // Check if the user is on the callback path
     if (window.location.pathname === '/callback') {
       const script = document.createElement('script');
-      script.src = '/callback.js'; /* Path points to public folder */
-      document.body.appendChild(script);
+      script.src = '/callback.js'; // Path to callback.js in public folder
+      document.body.appendChild(script); // Dynamically load the script
     }
   </script>
 </body>
