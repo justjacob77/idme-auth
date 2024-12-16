@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Callback</title>
+  <script>
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const authCode = urlParams.get('code');
+
+    if (authCode) {
+      document.body.innerHTML = `<h1>Authorization Code:</h1><p>${authCode}</p>`;
+    } else {
+      document.body.innerHTML = `<h1>Error: No Authorization Code Found</h1>`;
+    }
+  </script>
+</head>
+<body>
+</body>
+</html>
