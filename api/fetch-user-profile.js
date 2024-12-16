@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -27,33 +29,46 @@ export default async function handler(req, res) {
 
     if (!tokenResponse.ok) {
       const error = await tokenResponse.json();
+      console.error('Token Exchange Error:', error);
       return res.status(tokenResponse.status).json({ error });
     }
 
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-  // Step 2: Fetch the user's profile
-const profileResponse = await fetch('https://api.id.me/api/public/v3/userinfo', {
-  method: 'GET',
-  headers: {
-    Authorization: `Bearer ${accessToken}`,
-  },
-});
+    // Step 2: Fetch the user's profile from UserInfo endpoint
+    const profileResponse = await fetch('https://api.id.me/api/public/v3/userinfo', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
-if (!profileResponse.ok) {
-  const error = await profileResponse.json();
-  console.error('UserInfo API Error:', error); // Log API errors
-  return res.status(profileResponse.status).json({ error });
-}
+    if (!profileResponse.ok) {
+      const error = await profileResponse.json();
+      console.error('UserInfo API Error:', error);
+      return res.status(profileResponse.status).json({ error });
+    }
 
-const profileData = await profileResponse.json();
-console.log('UserInfo Response:', profileData); // Log the full UserInfo response
+    const jwtToken = await profileResponse.text(); // The UserInfo response is a JWT token
 
-// Return the profile data
-res.status(200).json(profileData);
+    // Step 3: Decode the JWT to extract user details
+    const decoded = jwt.decode(jwtToken); // Decode the token without verifying the signature
+
+    if (!decoded) {
+      console.error('JWT Decode Error');
+      return res.status(500).json({ error: 'Failed to decode user information' });
+    }
+
+    console.log('Decoded JWT:', decoded); // Log the decoded JWT for debugging
+
+    // Step 4: Return user information
+    res.status(200).json({
+      name: `${decoded.fname || ''} ${decoded.lname || ''}`.trim(),
+      email: decoded.email || 'Not Provided',
+    });
   } catch (error) {
-    console.error(error);
+    console.error('Server Error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 }
