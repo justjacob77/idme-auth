@@ -1,6 +1,22 @@
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
 
-export default async function handler(req, res) {
+const client = jwksClient({
+  jwksUri: 'https://api.id.me/oidc/.well-known/jwks',
+});
+
+function getKey(header, callback) {
+  client.getSigningKey(header.kid, (err, key) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      const signingKey = key.getPublicKey();
+      callback(null, signingKey);
+    }
+  });
+}
+
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
@@ -52,19 +68,23 @@ export default async function handler(req, res) {
 
     const jwtToken = await profileResponse.text();
 
-    // Log the raw JWT token for debugging
-    console.log('Raw JWT Token:', jwtToken);
+    // Step 3: Decode and verify the JWT
+    jwt.verify(jwtToken, getKey, { algorithms: ['RS256'] }, (err, decoded) => {
+      if (err) {
+        console.error('JWT Verification Error:', err);
+        return res.status(500).json({ error: 'Failed to verify JWT token', details: err.message });
+      }
 
-    // Step 3: Decode the JWT
-    const decoded = jwt.decode(jwtToken);
+      console.log('Decoded JWT:', decoded);
 
-    if (!decoded) {
-      console.error('JWT Decode Error');
-      return res.status(500).json({ error: 'Failed to decode JWT token' });
-    }
-
-    console.log('Decoded JWT:', decoded);
-
-    // Step 4: Return user information
-    res.status(200).json({
-      name: `${decoded.fname || ''} ${decoded.lname || ''}`
+      // Step 4: Return user information
+      res.status(200).json({
+        name: `${decoded.fname || ''} ${decoded.lname || ''}`.trim(),
+        email: decoded.email || 'Not Provided',
+      });
+    });
+  } catch (error) {
+    console.error('Unexpected Server Error:', error.message);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+};
