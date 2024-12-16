@@ -14,7 +14,7 @@
 
       if (authCode) {
         try {
-          // Step 1: Call your serverless function to get the access token and user profile
+          // Call the backend serverless function to handle token exchange and profile fetch
           const profileResponse = await fetch('/api/fetch-user-profile', {
             method: 'POST',
             headers: {
@@ -32,16 +32,10 @@
           }
 
           const profileData = await profileResponse.json();
-
-          // Step 2: Extract nested attributes if necessary
-          const name = profileData.attributes?.find(attr => attr.name === 'name')?.value || 'Unknown';
-          const email = profileData.attributes?.find(attr => attr.name === 'email')?.value || 'Unknown';
-
-          // Step 3: Display the user's information
           document.body.innerHTML = `
             <h1>User Profile</h1>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Name:</strong> ${profileData.name}</p>
+            <p><strong>Email:</strong> ${profileData.email}</p>
           `;
         } catch (error) {
           console.error(error);
