@@ -14,7 +14,7 @@
 
       if (authCode) {
         try {
-          // Exchange the authorization code for an access token
+          // Exchange authorization code for an access token
           const tokenResponse = await fetch('/api/exchange-token', {
             method: 'POST',
             headers: {
@@ -27,13 +27,14 @@
           });
 
           if (!tokenResponse.ok) {
-            throw new Error('Failed to exchange token');
+            const errorData = await tokenResponse.json();
+            throw new Error(errorData.error_description || 'Failed to exchange token');
           }
 
           const tokenData = await tokenResponse.json();
           const accessToken = tokenData.access_token;
 
-          // Use the access token to get the user's profile
+          // Fetch the user's profile
           const profileResponse = await fetch('https://api.id.me/api/public/v3/attributes.json', {
             method: 'GET',
             headers: {
@@ -42,12 +43,24 @@
           });
 
           if (!profileResponse.ok) {
-            throw new Error('Failed to fetch profile');
+            const errorData = await profileResponse.json();
+            throw new Error(errorData.error_description || 'Failed to fetch profile');
           }
 
           const profileData = await profileResponse.json();
           document.body.innerHTML = `
-            <h2>User Name:</h2>
-            <p>${profileData.name}</p>
+            <h1>User Profile</h1>
+            <p><strong>Name:</strong> ${profileData.name}</p>
+            <p><strong>Email:</strong> ${profileData.email}</p>
           `;
         } catch (error) {
+          console.error(error);
+          document.body.innerHTML = `<h2>Error:</h2><p>${error.message}</p>`;
+        }
+      } else {
+        document.body.innerHTML = `<h1>Error: No Authorization Code Found</h1>`;
+      }
+    });
+  </script>
+</body>
+</html>
