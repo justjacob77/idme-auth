@@ -48,6 +48,9 @@ export default async function handler(req, res) {
 
     const profileData = await profileResponse.json();
 
+    // Log the full response for debugging
+    console.log('Profile Data:', profileData);
+
     // Return the profile data
     res.status(200).json(profileData);
   } catch (error) {
