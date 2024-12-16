@@ -22,8 +22,8 @@ module.exports = async function handler(req, res) {
       grant_type: 'authorization_code',
       code: code,
       redirect_uri: redirect_uri,
-      client_id: 'YOUR_CLIENT_ID', // Replace with your Client ID
-      client_secret: 'YOUR_CLIENT_SECRET', // Replace with your Client Secret
+      client_id: '28bf5c72de76f94a5fb1d9454e347d4e', // Replace with your Client ID
+      client_secret: '3e9f2e9716dba6ec74a2e42e90974828', // Replace with your Client Secret
     });
 
     const tokenResponse = await fetch(tokenEndpoint, {
