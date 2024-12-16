@@ -1,67 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Callback</title>
-  <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      const authCode = urlParams.get('code');
+const tokenResponse = await fetch('/api/exchange-token', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    code: authCode,
+    redirect_uri: 'https://idme-auth-justjacob77s-projects.vercel.app/callback.html',
+  }),
+});
 
-      if (authCode) {
-        document.body.innerHTML = `<h1>Authorization Code:</h1><p>${authCode}</p>`;
+if (!tokenResponse.ok) {
+  throw new Error('Failed to exchange token');
+}
 
-        // Exchange the authorization code for an access token
-        try {
-          const tokenResponse = await fetch('https://api.id.me/oauth/token', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-              grant_type: 'authorization_code',
-              code: authCode,
-              redirect_uri: 'https://idme-auth-justjacob77s-projects.vercel.app/callback.html', // Replace with your callback URI
-              client_id: '28bf5c72de76f94a5fb1d9454e347d4e', // Replace with your Client ID
-              client_secret: '3e9f2e9716dba6ec74a2e42e90974828', // Replace with your Client Secret
-            }),
-          });
+const tokenData = await tokenResponse.json();
+const accessToken = tokenData.access_token;
 
-          if (!tokenResponse.ok) {
-            throw new Error('Failed to exchange token');
-          }
+// Use the access token to get the user's profile
+const profileResponse = await fetch('https://api.id.me/api/public/v3/attributes.json', {
+  method: 'GET',
+  headers: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+});
 
-          const tokenData = await tokenResponse.json();
-          const accessToken = tokenData.access_token;
+if (!profileResponse.ok) {
+  throw new Error('Failed to fetch profile');
+}
 
-          document.body.innerHTML += `<h2>Access Token:</h2><p>${accessToken}</p>`;
-
-          // Use the access token to get the user's profile
-          const profileResponse = await fetch('https://api.id.me/api/public/v3/attributes.json', {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-
-          if (!profileResponse.ok) {
-            throw new Error('Failed to fetch profile');
-          }
-
-          const profileData = await profileResponse.json();
-          document.body.innerHTML += `<h2>User Name:</h2><p>${profileData.name}</p>`;
-        } catch (error) {
-          console.error(error);
-          document.body.innerHTML += `<h2>Error:</h2><p>${error.message}</p>`;
-        }
-      } else {
-        document.body.innerHTML = `<h1>Error: No Authorization Code Found</h1>`;
-      }
-    });
-  </script>
-</head>
-<body>
-</body>
-</html>
+const profileData = await profileResponse.json();
+document.body.innerHTML += `<h2>User Name:</h2><p>${profileData.name}</p>`;
