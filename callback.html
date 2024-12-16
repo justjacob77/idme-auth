@@ -14,8 +14,8 @@
 
       if (authCode) {
         try {
-          // Call the backend serverless function to handle token exchange and profile fetch
-          const profileResponse = await fetch('/api/fetch-user-profile', {
+          // Exchange authorization code for an access token
+          const tokenResponse = await fetch('/api/exchange-token', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -26,9 +26,25 @@
             }),
           });
 
+          if (!tokenResponse.ok) {
+            const errorData = await tokenResponse.json();
+            throw new Error(errorData.error_description || 'Failed to exchange token');
+          }
+
+          const tokenData = await tokenResponse.json();
+          const accessToken = tokenData.access_token;
+
+          // Fetch the user's profile
+          const profileResponse = await fetch('https://api.id.me/api/public/v3/attributes.json', {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+
           if (!profileResponse.ok) {
             const errorData = await profileResponse.json();
-            throw new Error(errorData.error || 'Failed to fetch profile');
+            throw new Error(errorData.error_description || 'Failed to fetch profile');
           }
 
           const profileData = await profileResponse.json();
