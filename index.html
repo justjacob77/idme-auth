@@ -2,9 +2,9 @@
   <button>Verify with ID.me</button>
 </a>
 <script>
-  if (window.location.pathname === '/public/callback') {
+  if (window.location.pathname === '/callback') {
     const script = document.createElement('script');
-    script.src = '/public/callback.js'; /* Adjusted path */
+    script.src = '/callback.js'; /* Adjusted path */
     document.body.appendChild(script);
   }
 </script>
