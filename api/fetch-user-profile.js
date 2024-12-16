@@ -1,5 +1,21 @@
-const fetch = require('node-fetch');
 const jwt = require('jsonwebtoken');
+const fetch = require('node-fetch');
+const jwksClient = require('jwks-rsa');
+
+const client = jwksClient({
+  jwksUri: 'https://api.id.me/oidc/.well-known/jwks',
+});
+
+function getKey(header, callback) {
+  client.getSigningKey(header.kid, (err, key) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      const signingKey = key.getPublicKey();
+      callback(null, signingKey);
+    }
+  });
+}
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -14,27 +30,23 @@ module.exports = async function handler(req, res) {
 
   try {
     console.log('Received Authorization Code:', code);
-    console.log('Redirect URI:', redirect_uri);
 
     // Step 1: Exchange authorization code for access token
-    const tokenEndpoint = 'https://api.id.me/oauth/token';
     const tokenPayload = new URLSearchParams({
       grant_type: 'authorization_code',
       code: code,
       redirect_uri: redirect_uri,
-      client_id: '28bf5c72de76f94a5fb1d9454e347d4e', // Replace with your Client ID
-      client_secret: '3e9f2e9716dba6ec74a2e42e90974828', // Replace with your Client Secret
+      client_id: 'YOUR_CLIENT_ID', // Replace with your Client ID
+      client_secret: 'YOUR_CLIENT_SECRET', // Replace with your Client Secret
     });
 
-    const tokenResponse = await fetch(tokenEndpoint, {
+    const tokenResponse = await fetch('https://api.id.me/oauth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: tokenPayload,
     });
-
-    console.log('Token Exchange Response Status:', tokenResponse.status);
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
@@ -46,8 +58,6 @@ module.exports = async function handler(req, res) {
     }
 
     const tokenData = await tokenResponse.json();
-    console.log('Token Exchange Success:', tokenData);
-
     const accessToken = tokenData.access_token;
 
     // Step 2: Fetch the user's profile (UserInfo endpoint)
@@ -70,22 +80,23 @@ module.exports = async function handler(req, res) {
     const jwtToken = await profileResponse.text();
     console.log('Received JWT Token:', jwtToken);
 
-    // Step 3: Decode the JWT to get user details
-    const decoded = jwt.decode(jwtToken);
+    // Step 3: Decode and verify the JWT
+    jwt.verify(jwtToken, getKey, { algorithms: ['RS256'] }, (err, decoded) => {
+      if (err) {
+        console.error('JWT Verification Error:', err.message);
+        return res.status(500).json({
+          error: 'Failed to verify JWT token',
+          details: err.message,
+        });
+      }
 
-    if (!decoded) {
-      console.error('JWT Decode Error: Failed to decode JWT');
-      return res.status(500).json({
-        error: 'Failed to decode user information',
+      console.log('Decoded JWT:', decoded);
+
+      // Step 4: Return user information
+      res.status(200).json({
+        name: `${decoded.fname || ''} ${decoded.lname || ''}`.trim(),
+        email: decoded.email || 'Not Provided',
       });
-    }
-
-    console.log('Decoded JWT:', decoded);
-
-    // Step 4: Return user information
-    res.status(200).json({
-      name: `${decoded.fname || ''} ${decoded.lname || ''}`.trim(),
-      email: decoded.email || 'Not Provided',
     });
   } catch (error) {
     console.error('Unexpected Server Error:', error.message);
