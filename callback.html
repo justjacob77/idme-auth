@@ -1,32 +1,53 @@
-const tokenResponse = await fetch('/api/exchange-token', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    code: authCode,
-    redirect_uri: 'https://idme-auth-justjacob77s-projects.vercel.app/callback.html',
-  }),
-});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Callback</title>
+</head>
+<body>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const authCode = urlParams.get('code');
 
-if (!tokenResponse.ok) {
-  throw new Error('Failed to exchange token');
-}
+      if (authCode) {
+        try {
+          // Exchange the authorization code for an access token
+          const tokenResponse = await fetch('/api/exchange-token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              code: authCode,
+              redirect_uri: 'https://idme-auth-justjacob77s-projects.vercel.app/callback.html',
+            }),
+          });
 
-const tokenData = await tokenResponse.json();
-const accessToken = tokenData.access_token;
+          if (!tokenResponse.ok) {
+            throw new Error('Failed to exchange token');
+          }
 
-// Use the access token to get the user's profile
-const profileResponse = await fetch('https://api.id.me/api/public/v3/attributes.json', {
-  method: 'GET',
-  headers: {
-    Authorization: `Bearer ${accessToken}`,
-  },
-});
+          const tokenData = await tokenResponse.json();
+          const accessToken = tokenData.access_token;
 
-if (!profileResponse.ok) {
-  throw new Error('Failed to fetch profile');
-}
+          // Use the access token to get the user's profile
+          const profileResponse = await fetch('https://api.id.me/api/public/v3/attributes.json', {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
 
-const profileData = await profileResponse.json();
-document.body.innerHTML += `<h2>User Name:</h2><p>${profileData.name}</p>`;
+          if (!profileResponse.ok) {
+            throw new Error('Failed to fetch profile');
+          }
+
+          const profileData = await profileResponse.json();
+          document.body.innerHTML = `
+            <h2>User Name:</h2>
+            <p>${profileData.name}</p>
+          `;
+        } catch (error) {
