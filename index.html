@@ -1,4 +1,4 @@
-<div><br class="Apple-interchange-newline"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,8 +7,15 @@
 </head>
 <body>
   <h1>Verify Your Identity</h1>
-  <a href="https://api.id.me/oauth/authorize?client_id=28bf5c72de76f94a5fb1d9454e347d4e&redirect_uri=https://idme-auth-justjacob77s-projects.vercel.app/public/callback&response_type=code&scope=login">
+  <a href="https://api.id.me/oauth/authorize?client_id=28bf5c72de76f94a5fb1d9454e347d4e&redirect_uri=https://idme-auth-justjacob77s-projects.vercel.app/callback&response_type=code&scope=login">
     <button>Verify with ID.me</button>
   </a>
+  <script>
+    if (window.location.pathname === '/callback') {
+      const script = document.createElement('script');
+      script.src = '/callback.js'; /* Path points to public folder */
+      document.body.appendChild(script);
+    }
+  </script>
 </body>
-</html></div>
+</html>
