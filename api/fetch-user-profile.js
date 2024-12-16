@@ -34,25 +34,22 @@ export default async function handler(req, res) {
     const accessToken = tokenData.access_token;
 
     // Step 2: Fetch the user's profile
-    const profileResponse = await fetch('https://api.id.me/api/public/v3/attributes.json', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+const profileResponse = await fetch('https://api.id.me/api/public/v3/userinfo', {
+  method: 'GET',
+  headers: {
+    Authorization: `Bearer ${accessToken}`,
+  },
+});
 
-    if (!profileResponse.ok) {
-      const error = await profileResponse.json();
-      return res.status(profileResponse.status).json({ error });
-    }
+if (!profileResponse.ok) {
+  const error = await profileResponse.json();
+  return res.status(profileResponse.status).json({ error });
+}
 
-    const profileData = await profileResponse.json();
+const profileData = await profileResponse.json();
 
-    // Log the full response for debugging
-    console.log('Profile Data:', profileData);
-
-    // Return the profile data
-    res.status(200).json(profileData);
+// Return the profile data
+res.status(200).json(profileData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
