@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-    // Step 2: Fetch the user's profile
+  // Step 2: Fetch the user's profile
 const profileResponse = await fetch('https://api.id.me/api/public/v3/userinfo', {
   method: 'GET',
   headers: {
@@ -43,10 +43,12 @@ const profileResponse = await fetch('https://api.id.me/api/public/v3/userinfo', 
 
 if (!profileResponse.ok) {
   const error = await profileResponse.json();
+  console.error('UserInfo API Error:', error); // Log API errors
   return res.status(profileResponse.status).json({ error });
 }
 
 const profileData = await profileResponse.json();
+console.log('UserInfo Response:', profileData); // Log the full UserInfo response
 
 // Return the profile data
 res.status(200).json(profileData);
