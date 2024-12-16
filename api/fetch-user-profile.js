@@ -22,21 +22,21 @@ export default async function handler(req, res) {
         grant_type: 'authorization_code',
         code,
         redirect_uri,
-        client_id: '28bf5c72de76f94a5fb1d9454e347d4e', // Replace with your Client ID
-        client_secret: '3e9f2e9716dba6ec74a2e42e90974828', // Replace with your Client Secret
+        client_id: 'YOUR_CLIENT_ID',
+        client_secret: 'YOUR_CLIENT_SECRET',
       }),
     });
 
     if (!tokenResponse.ok) {
-      const error = await tokenResponse.json();
-      console.error('Token Exchange Error:', error);
-      return res.status(tokenResponse.status).json({ error });
+      const errorText = await tokenResponse.text();
+      console.error('Token Exchange Error:', errorText);
+      return res.status(tokenResponse.status).json({ error: 'Failed to exchange token', details: errorText });
     }
 
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
 
-    // Step 2: Fetch the user's profile from UserInfo endpoint
+    // Step 2: Fetch the user's profile
     const profileResponse = await fetch('https://api.id.me/api/public/v3/userinfo', {
       method: 'GET',
       headers: {
@@ -45,30 +45,26 @@ export default async function handler(req, res) {
     });
 
     if (!profileResponse.ok) {
-      const error = await profileResponse.json();
-      console.error('UserInfo API Error:', error);
-      return res.status(profileResponse.status).json({ error });
+      const errorText = await profileResponse.text();
+      console.error('UserInfo API Error:', errorText);
+      return res.status(profileResponse.status).json({ error: 'Failed to fetch user info', details: errorText });
     }
 
-    const jwtToken = await profileResponse.text(); // The UserInfo response is a JWT token
+    const jwtToken = await profileResponse.text();
 
-    // Step 3: Decode the JWT to extract user details
-    const decoded = jwt.decode(jwtToken); // Decode the token without verifying the signature
+    // Log the raw JWT token for debugging
+    console.log('Raw JWT Token:', jwtToken);
+
+    // Step 3: Decode the JWT
+    const decoded = jwt.decode(jwtToken);
 
     if (!decoded) {
       console.error('JWT Decode Error');
-      return res.status(500).json({ error: 'Failed to decode user information' });
+      return res.status(500).json({ error: 'Failed to decode JWT token' });
     }
 
-    console.log('Decoded JWT:', decoded); // Log the decoded JWT for debugging
+    console.log('Decoded JWT:', decoded);
 
     // Step 4: Return user information
     res.status(200).json({
-      name: `${decoded.fname || ''} ${decoded.lname || ''}`.trim(),
-      email: decoded.email || 'Not Provided',
-    });
-  } catch (error) {
-    console.error('Server Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-}
+      name: `${decoded.fname || ''} ${decoded.lname || ''}`
