@@ -2,18 +2,20 @@ const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch');
 const jwksClient = require('jwks-rsa');
 
+// Configure JWKS client to fetch keys from ID.me
 const client = jwksClient({
   jwksUri: 'https://api.id.me/oidc/.well-known/jwks',
 });
 
+// Helper function to get the signing key based on "kid"
 function getKey(header, callback) {
   client.getSigningKey(header.kid, (err, key) => {
     if (err) {
-      callback(err, null);
-    } else {
-      const signingKey = key.getPublicKey();
-      callback(null, signingKey);
+      console.error('Failed to get signing key:', err.message);
+      return callback(err, null);
     }
+    const signingKey = key.getPublicKey();
+    callback(null, signingKey);
   });
 }
 
@@ -80,7 +82,7 @@ module.exports = async function handler(req, res) {
     const jwtToken = await profileResponse.text();
     console.log('Received JWT Token:', jwtToken);
 
-    // Step 3: Decode and verify the JWT
+    // Step 3: Verify and decode the JWT
     jwt.verify(jwtToken, getKey, { algorithms: ['RS256'] }, (err, decoded) => {
       if (err) {
         console.error('JWT Verification Error:', err.message);
