@@ -60,6 +60,14 @@
       text-align: center;
       padding: 1rem 0;
     }
+    ul {
+      text-align: left;
+      margin: 0 auto;
+      max-width: 400px;
+      list-style-type: disc;
+      color: #555;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
@@ -72,27 +80,24 @@
 
   <!-- Main Content -->
   <main>
- <div class="profile-container" id="profile-container">
-  <h1>Welcome to State Health & Human Services</h1>
-  <p>
-    Your identity has been securely verified through <strong>ID.me</strong>, ensuring a trusted connection between you and the State Agency. 
-    By verifying your information, we can confidently deliver the resources and services you need while safeguarding your personal data.
-  </p>
-  
-  <h2>Why This Matters</h2>
-  <ul style="text-align: left; margin: 0 auto; max-width: 400px; list-style-type: disc; color: #555; line-height: 1.6;">
-    <li>You are connecting to a <strong>trusted and secure platform</strong>.</li>
-    <li>Your information is <strong>protected</strong> and will not be misused.</li>
-    <li>We ensure services are delivered to the <strong>right people</strong> efficiently and securely.</li>
-  </ul>
-  
-  <!-- Placeholder for user profile -->
-  <div id="user-profile" style="margin-top: 2rem;"></div>
-</div>
-    
-    
     <div class="profile-container" id="profile-container">
-      <p>Loading user information...</p>
+      <h1>Welcome to State Health & Human Services</h1>
+      <p>
+        Your identity has been securely verified through <strong>ID.me</strong>, ensuring a trusted connection between you and the State Agency. 
+        By verifying your information, we can confidently deliver the resources and services you need while safeguarding your personal data.
+      </p>
+
+      <h2>Why This Matters</h2>
+      <ul>
+        <li>You are connecting to a <strong>trusted and secure platform</strong>.</li>
+        <li>Your information is <strong>protected</strong> and will not be misused.</li>
+        <li>We ensure services are delivered to the <strong>right people</strong> efficiently and securely.</li>
+      </ul>
+
+      <!-- Placeholder for dynamic user profile -->
+      <div id="user-profile" style="margin-top: 2rem;">
+        <p>Loading user information...</p>
+      </div>
     </div>
   </main>
 
@@ -107,7 +112,7 @@
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const authCode = urlParams.get('code');
-      const profileContainer = document.getElementById('profile-container');
+      const userProfile = document.getElementById('user-profile');
 
       if (authCode) {
         try {
@@ -129,19 +134,19 @@
           }
 
           const profileData = await profileResponse.json();
-          profileContainer.innerHTML = `
+          userProfile.innerHTML = `
             <h2>Welcome, ${profileData.name}</h2>
             <p><strong>Email:</strong> ${profileData.email}</p>
           `;
         } catch (error) {
           console.error(error);
-          profileContainer.innerHTML = `
+          userProfile.innerHTML = `
             <p class="error">Error:</p>
             <p>${error.message}</p>
           `;
         }
       } else {
-        profileContainer.innerHTML = `
+        userProfile.innerHTML = `
           <h2 class="error">Error: No Authorization Code Found</h2>
         `;
       }
