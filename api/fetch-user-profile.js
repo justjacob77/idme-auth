@@ -81,8 +81,8 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const jwtToken = await profileResponse.text();
-    console.log('Received JWT Token:', jwtToken);
+const jwtToken = await profileResponse.text();
+console.log('Raw JWT Token:', jwtToken);
 
     // Step 3: Verify and decode the JWT
     jwt.verify(
