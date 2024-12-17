@@ -62,68 +62,63 @@ module.exports = async function handler(req, res) {
 
     const tokenData = await tokenResponse.json();
     console.log('Token Exchange Success:', tokenData);
-console.log('Access Token:', tokenData.access_token);
-console.log('Refresh Token:', tokenData.refresh_token);
-console.log('Token Expiry (seconds):', tokenData.expires_in);
+    console.log('Access Token:', tokenData.access_token);
+    console.log('Refresh Token:', tokenData.refresh_token);
+    console.log('Token Expiry (seconds):', tokenData.expires_in);
+
     const accessToken = tokenData.access_token;
 
-// Step 2: Fetch the user's profile JWT token
-const profileResponse = await fetch('https://api.id.me/api/public/v3/userinfo', {
-  method: 'GET',
-  headers: {
-    Authorization: `Bearer ${accessToken}`,
-  },
-});
+    // Step 2: Fetch the user's profile JWT token
+    const profileResponse = await fetch('https://api.id.me/api/public/v3/userinfo', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
-if (!profileResponse.ok) {
-  const errorText = await profileResponse.text();
-  console.error('UserInfo API Error:', errorText);
-  return res.status(profileResponse.status).json({
-    error: 'Failed to fetch user info',
-    details: errorText,
-  });
-}
-
-// Retrieve and clean up the JWT token
-let jwtToken = await profileResponse.text();
-console.log('Raw JWT Token (before stripping quotes):', jwtToken);
-
-// Remove quotes around the token
-jwtToken = jwtToken.replace(/^"|"$/g, '');
-console.log('JWT Token (after stripping quotes):', jwtToken);
-
-// Decode the JWT without verification for debugging
-const decodedToken = jwt.decode(jwtToken, { complete: true });
-console.log('Decoded JWT Header:', decodedToken?.header);
-console.log('Decoded JWT Payload:', decodedToken?.payload);
-
-// Step 3: Verify and decode the JWT
-jwt.verify(
-  jwtToken,
-  getKey,
-  {
-    algorithms: ['RS256'],
-    issuer: 'https://api.id.me/oidc',
-    audience: '28bf5c72de76f94a5fb1d9454e347d4e',
-  },
-  (err, decoded) => {
-    if (err) {
-      console.error('JWT Verification Error:', err.message);
-      return res.status(500).json({
-        error: 'Failed to verify JWT token',
-        details: err.message,
+    if (!profileResponse.ok) {
+      const errorText = await profileResponse.text();
+      console.error('UserInfo API Error:', errorText);
+      return res.status(profileResponse.status).json({
+        error: 'Failed to fetch user info',
+        details: errorText,
       });
     }
 
-    console.log('Verified and Decoded JWT:', decoded);
+    // Retrieve and clean up the JWT token
+    let jwtToken = await profileResponse.text();
+    console.log('Raw JWT Token (before stripping quotes):', jwtToken);
 
-    // Return user profile data
-    res.status(200).json({
-      name: `${decoded.fname || ''} ${decoded.lname || ''}`.trim(),
-      email: decoded.email || 'Not Provided',
-    });
-  }
-);        // Step 4: Return user profile data
+    jwtToken = jwtToken.replace(/^"|"$/g, ''); // Remove quotes around the token
+    console.log('JWT Token (after stripping quotes):', jwtToken);
+
+    // Decode the JWT without verification for debugging
+    const decodedToken = jwt.decode(jwtToken, { complete: true });
+    console.log('Decoded JWT Header:', decodedToken?.header);
+    console.log('Decoded JWT Payload:', decodedToken?.payload);
+
+    // Step 3: Verify and decode the JWT
+    jwt.verify(
+      jwtToken,
+      getKey,
+      {
+        algorithms: ['RS256'],
+        issuer: 'https://api.id.me/oidc',
+        audience: '28bf5c72de76f94a5fb1d9454e347d4e',
+        clockTolerance: 10, // Allow slight clock skew
+      },
+      (err, decoded) => {
+        if (err) {
+          console.error('JWT Verification Error:', err.message);
+          return res.status(500).json({
+            error: 'Failed to verify JWT token',
+            details: err.message,
+          });
+        }
+
+        console.log('Verified and Decoded JWT:', decoded);
+
+        // Step 4: Return user profile data
         res.status(200).json({
           name: `${decoded.fname || ''} ${decoded.lname || ''}`.trim(),
           email: decoded.email || 'Not Provided',
