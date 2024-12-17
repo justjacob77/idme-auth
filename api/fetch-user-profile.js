@@ -9,13 +9,14 @@ const client = jwksClient({
 
 // Helper function to retrieve the signing key
 function getKey(header, callback) {
-  console.log('Decoded JWT Header:', header); // Log the JWT Header for debugging
+  console.log('Decoded JWT Header:', header); // Log the JWT Header
   client.getSigningKey(header.kid, (err, key) => {
     if (err) {
-      console.error('Failed to get signing key:', err.message);
+      console.error('Error fetching JWKS key:', err.message);
       return callback(err, null);
     }
     const signingKey = key.getPublicKey();
+    console.log('Fetched Signing Key:', signingKey); // Log the signing key
     callback(null, signingKey);
   });
 }
