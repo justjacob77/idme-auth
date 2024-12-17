@@ -3,14 +3,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Callback</title>
+  <title>State Health and Human Services - User Profile</title>
+  <!-- Google Fonts for typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9fafc;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: url('https://source.unsplash.com/1600x400/?family,children') center/cover no-repeat;
+      color: #fff;
+      text-align: center;
+      padding: 2.5rem 1rem;
+      font-size: 1.5rem;
+      text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    main {
+      flex: 1;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #004080;
+      margin-bottom: 1rem;
+      font-size: 2rem;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      color: #555;
+    }
+    .error {
+      color: #c00;
+      font-weight: bold;
+    }
+    .profile-container {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      margin: 2rem auto;
+    }
+    footer {
+      background-color: #004080;
+      color: #fff;
+      text-align: center;
+      padding: 1rem 0;
+    }
+  </style>
 </head>
 <body>
+
+  <!-- Header -->
+  <header>
+    <h1>State Health & Human Services</h1>
+    <p>Supporting Families, Protecting Children, Building Stronger Communities</p>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <h1>User Profile</h1>
+    <div class="profile-container" id="profile-container">
+      <p>Loading user information...</p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2024 State Health & Human Services. All rights reserved.</p>
+  </footer>
+
+  <!-- Script to Fetch Profile -->
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const authCode = urlParams.get('code');
+      const profileContainer = document.getElementById('profile-container');
 
       if (authCode) {
         try {
@@ -32,17 +111,21 @@
           }
 
           const profileData = await profileResponse.json();
-          document.body.innerHTML = `
-            <h1>User Profile</h1>
-            <p><strong>Name:</strong> ${profileData.name}</p>
+          profileContainer.innerHTML = `
+            <h2>Welcome, ${profileData.name}</h2>
             <p><strong>Email:</strong> ${profileData.email}</p>
           `;
         } catch (error) {
           console.error(error);
-          document.body.innerHTML = `<h2>Error:</h2><p>${error.message}</p>`;
+          profileContainer.innerHTML = `
+            <p class="error">Error:</p>
+            <p>${error.message}</p>
+          `;
         }
       } else {
-        document.body.innerHTML = `<h1>Error: No Authorization Code Found</h1>`;
+        profileContainer.innerHTML = `
+          <h2 class="error">Error: No Authorization Code Found</h2>
+        `;
       }
     });
   </script>
