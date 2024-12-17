@@ -62,7 +62,9 @@ module.exports = async function handler(req, res) {
 
     const tokenData = await tokenResponse.json();
     console.log('Token Exchange Success:', tokenData);
-
+console.log('Access Token:', tokenData.access_token);
+console.log('Refresh Token:', tokenData.refresh_token);
+console.log('Token Expiry (seconds):', tokenData.expires_in);
     const accessToken = tokenData.access_token;
 
     // Step 2: Fetch the user's profile JWT token
